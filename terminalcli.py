@@ -5,6 +5,7 @@ import sqlite3
 import tkinter as tk
 
 root = tk.Tk()
+root.title("DALM1TCPChat")
 
 # Crée l'entrée
 entry = tk.Entry(root)
@@ -39,7 +40,11 @@ thread.start()
 # Exécution de la boucle d'événements dans le thread principal
 asyncio.run(root.mainloop())
 
-button = tk.Button(root, text="Envoyer", command=lambda message: send_message(message))
+def on_enter(event):
+  message = entry.get()
+  send_message(message=message)
+
+button = tk.Button(root, text="Envoyer", command=on_enter)
 button.pack()
 
-entry.bind("<Return>", send_message)
+entry.bind("<Return>", on_enter)
