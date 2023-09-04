@@ -5,7 +5,19 @@ import sqlite3
 import tkinter as tk
 
 
-async def main():
+async def send_message(message):
+  # Envoie le message au serveur
+  connection = await asyncio.open_connection("localhost", 8080)
+  connection.sendall(message.encode())
+
+  # Attend la réponse du serveur
+  data = await connection.recv(b"1024")
+
+  # Affiche la réponse du serveur
+  print(data.decode())
+
+
+def main():
   # Crée une base de données pour stocker les informations sur les clients et les discussions
   conn = sqlite3.connect("chat.db")
   cur = conn.cursor()
@@ -33,17 +45,5 @@ async def main():
   asyncio.run(root.mainloop())
 
 
-async def send_message(message):
-  # Envoie le message au serveur
-  connection = await asyncio.open_connection("localhost", 8080)
-  connection.sendall(message.encode())
-
-  # Attend la réponse du serveur
-  data = await connection.recv(b"1024")
-
-  # Affiche la réponse du serveur
-  print(data.decode())
-
-
 if __name__ == "__main__":
-  asyncio.run(main())
+  main()
