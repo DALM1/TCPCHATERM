@@ -1,25 +1,3 @@
-import socket
-import threading
-import sqlite3
-
-def create_socket():
-  """Crée une socket TCP."""
-  socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  return socket
-
-def connect_to_server(socket, host, port):
-  """Connecte une socket à un serveur."""
-  socket.connect((host, port))
-
-def send_message(socket, message):
-  """Envoi un message à un serveur."""
-  socket.sendall(message.encode())
-
-def receive_message(socket):
-  """Reçoit un message d'un serveur."""
-  data = socket.recv(1024).decode()
-  return data
-
 def main():
   """Exécute le terminal."""
 
@@ -54,4 +32,3 @@ def main():
     if data.startswith("NEW_CLIENT"):
       # Un nouveau client
       print("Un nouveau client s'est connecté : " + data[7:])
-
