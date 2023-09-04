@@ -10,10 +10,7 @@ root = tk.Tk()
 entry = tk.Entry(root)
 entry.pack()
 
-def send_message():
-  # Récupère le message dans l'entrée
-  message = entry.get()
-
+def send_message(message):
   # Envoie le message au serveur
   connection = asyncio.run(asyncio.open_connection("localhost", 8080))
   connection.sendall(message.encode())
@@ -50,3 +47,9 @@ thread.start()
 
 # Exécution de la boucle d'événements dans le thread principal
 asyncio.run(root.mainloop())
+
+def on_enter(event):
+  message = entry.get()
+  send_message(message)
+
+entry.bind("<Return>", on_enter)
