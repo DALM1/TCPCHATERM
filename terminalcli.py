@@ -1,51 +1,43 @@
 import asyncio
-import threading
-import sqlite3
-
 import tkinter as tk
 
+root = tk.Tk()
 
-async def send_message(message):
+def main():
+  # Crée une zone de texte pour saisir le message
+  entry = tk.Entry(root)
+
+  # attache un écouteur d'événement à la zone de texte pour envoyer le message lorsque la touche `Enter` est pressée, seulement si la zone de texte a une valeur
+  entry.bind("<Return>", lambda event: asyncio.run(send_message(message=entry.get().strip() or b"")))
+
+  # Place les widgets sur la fenêtre
+  entry.pack()
+
+  # Lance la boucle d'événements
+  asyncio.run(root.mainloop())
+
+async def send_message(message=None):
   # Envoie le message au serveur
   connection = await asyncio.open_connection("localhost", 8080)
-  connection.sendall(message.encode())
+
+  # Décompose le tuple de retour de la fonction asyncio.open_connection()
+  stream_reader, stream_writer = connection
+
+  # Convertit le message en bytes
+  message_bytes = asyncio.coalesce(message.encode("utf-8"), b"")
+
+  # Envoie le message au serveur en utilisant le StreamWriter
+  await stream_writer.write(message_bytes)
+  await stream_writer.drain()
 
   # Attend la réponse du serveur
-  data = await connection.recv(b"1024")
+  data = await stream_reader.readuntil(b"\n")
 
   # Affiche la réponse du serveur
   print(data.decode())
 
-
-def main():
-  # Crée une base de données pour stocker les informations sur les clients et les discussions
-  conn = sqlite3.connect("chat.db")
-  cur = conn.cursor()
-
-  # Commente la ligne ci-dessous si la table discussions existe déjà
-  # cur.execute("CREATE TABLE discussions (id INTEGER PRIMARY KEY, name TEXT, participants TEXT)")
-
-  # Ajoute le client actuel à la table des clients
-  cur.execute("INSERT INTO clients (name, ip, port) VALUES ('[Votre nom]', '127.0.0.1', 8080)")
-  conn.commit()
-
-
-  # Crée une fenêtre Tkinter
-  root = tk.Tk()
-  root.title("DALM1TCPCHAT")
-  root.configure(background="black")
-
-  # Crée l'entrée
-  entry = tk.Entry(root, foreground="white")
-  entry.pack()
-
-  # Crée un bouton pour envoyer le message
-  button = tk.Button(root, text="Envoyer", command=lambda: send_message(message=entry.get()))
-  button.pack()
-
-  # Crée une boucle d'événements pour traiter les messages du serveur
-  asyncio.run(root.mainloop())
-
+  # Ferme le StreamWriter
+  await stream_writer.close()
 
 if __name__ == "__main__":
-  main()
+  asyncio.run(main())
