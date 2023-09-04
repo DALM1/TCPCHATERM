@@ -11,16 +11,7 @@ entry = tk.Entry(root)
 entry.pack()
 
 def send_message(message):
-  # Envoie le message au serveur
-  connection = asyncio.run(asyncio.open_connection("localhost", 8080))
-  connection.sendall(message.encode())
-
-  # Efface le message de l'entrée
-  entry.delete(0, tk.END)
-
-
-button = tk.Button(root, text="Envoyer", command=send_message)
-button.pack()
+  asyncio.run(send_message(message))
 
 
 # Crée une base de données pour stocker les informations sur les clients et les discussions
@@ -48,8 +39,7 @@ thread.start()
 # Exécution de la boucle d'événements dans le thread principal
 asyncio.run(root.mainloop())
 
-def on_enter(event):
-  message = entry.get()
-  send_message(message=message)
+button = tk.Button(root, text="Envoyer", command=lambda message: send_message(message))
+button.pack()
 
-entry.bind("<Return>", on_enter)
+entry.bind("<Return>", send_message)
