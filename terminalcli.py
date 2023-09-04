@@ -38,7 +38,7 @@ def main():
   entry.pack()
 
   # Crée un bouton pour envoyer le message
-  button = tk.Button(root, text="Envoyer", command=lambda: send_message(message=entry.get()))
+  button = tk.Button(root, text="Envoyer", command=lambda: asyncio.run(send_message(message=entry.get())))
   button.pack()
 
   # Crée une boucle d'événements pour traiter les messages du serveur
