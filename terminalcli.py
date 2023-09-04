@@ -50,6 +50,6 @@ asyncio.run(root.mainloop())
 
 def on_enter(event):
   message = entry.get()
-  send_message(message)
+  send_message(message=message)
 
 entry.bind("<Return>", on_enter)
